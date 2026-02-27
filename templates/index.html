@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUNAT | Registro Inteligente</title>
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- Phosphor Icons for a premium look -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <!-- Dynamic Background Elements -->
+    <div class="bg-blur blur-red"></div>
+    <div class="bg-blur blur-blue"></div>
+
+    <div class="app-container">
+
+        <!-- HEADER -->
+        <header class="glass-header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="logo-box">
+                        <i class="ph ph-buildings"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>SUNAT</h1>
+                        <p>Plataforma de Registro</p>
+                    </div>
+                </div>
+
+                <div id="connection-status" class="status-pill offline">
+                    <div class="pulse-dot"></div>
+                    <span id="status-text">Verificando conexión...</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+
+            <!-- STATS DASHBOARD -->
+            <div class="dashboard-cards">
+                <div class="stat-card form-variant">
+                    <div class="stat-icon">
+                        <i class="ph ph-file-text"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Formulario 194</h3>
+                        <p class="stat-value" id="count-formulario">0</p>
+                        <span class="stat-label">Registros Guardados</span>
+                    </div>
+                </div>
+
+                <div class="stat-card exp-variant">
+                    <div class="stat-icon">
+                        <i class="ph ph-folder-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Expedientes M.P.</h3>
+                        <p class="stat-value" id="count-expediente">0</p>
+                        <span class="stat-label">Registros Guardados</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTRATION AREA -->
+            <div class="registration-panel glass-panel">
+
+                <!-- TYPE SELECTOR -->
+                <div class="type-selector">
+                    <button class="type-btn active" id="btn-formulario" onclick="setMode('formulario')">
+                        <i class="ph ph-file-text"></i>
+                        <span>Formulario 194</span>
+                    </button>
+                    <button class="type-btn" id="btn-expediente" onclick="setMode('expediente')">
+                        <i class="ph ph-folder-open"></i>
+                        <span>Exp. Mesa de Partes</span>
+                    </button>
+                </div>
+
+                <!-- FORMS CONTAINER -->
+                <div class="forms-wrapper" id="forms-wrapper">
+
+                    <!-- FORMULARIO 194 -->
+                    <form id="form-formulario" class="dynamic-form" onsubmit="return saveFormulario(event)">
+
+                        <div class="form-grid">
+                            <!-- N° Documento -->
+                            <div class="input-group full-width">
+                                <label for="f-documento">N° de Documento</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-hash"></i>
+                                    <input type="text" id="f-documento" placeholder="Ej: 1390400006411" required
+                                        autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- Razón Social -->
+                            <div class="input-group full-width">
+                                <label for="f-razon">Razón Social</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-buildings"></i>
+                                    <input type="text" id="f-razon" placeholder="Nombre de la empresa o persona"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- RUC -->
+                            <div class="input-group">
+                                <label for="f-ruc">RUC <span class="validation-msg" id="f-ruc-hint"></span></label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-identification-card"></i>
+                                    <input type="text" id="f-ruc" placeholder="11 dígitos" maxlength="11" required
+                                        autocomplete="off" oninput="validateRUC(this)">
+                                </div>
+                            </div>
+
+                            <!-- Fecha -->
+                            <div class="input-group">
+                                <label for="f-fecha">
+                                    Fecha Extrema
+                                    <button type="button" class="btn-tool" onclick="fillToday('f-fecha')"
+                                        title="Usar fecha actual">
+                                        <i class="ph ph-calendar-plus"></i> Hoy
+                                    </button>
+                                </label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-calendar-blank"></i>
+                                    <input type="text" id="f-fecha" placeholder="DD/MM/AAAA" maxlength="10"
+                                        autocomplete="off" oninput="formatDateInput(this)">
+                                </div>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="input-group full-width">
+                                <label for="f-obs">Observaciones <span class="badge-optional">Opcional</span></label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-chat-text"></i>
+                                    <input type="text" id="f-obs" placeholder="Detalles adicionales..."
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="clearForm()">
+                                <i class="ph ph-arrow-counter-clockwise"></i> Limpiar
+                            </button>
+                            <button type="submit" class="btn-primary" id="save-formulario">
+                                <i class="ph ph-floppy-disk"></i> Guardar Registro
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- EXPEDIENTE -->
+                    <form id="form-expediente" class="dynamic-form hidden" onsubmit="return saveExpediente(event)">
+
+                        <div class="form-grid">
+                            <!-- N° Expediente (Smart Input) -->
+                            <div class="input-group full-width">
+                                <label>N° Expediente</label>
+                                <div class="smart-input-container">
+                                    <div class="smart-prefix">000-URD</div>
+                                    <div class="smart-fields">
+                                        <input type="text" id="e-p1" maxlength="3" placeholder="000"
+                                            oninput="autoTab(this, 'e-p2', 3)" autocomplete="off">
+                                        <span class="divider">-</span>
+                                        <input type="text" id="e-p2" maxlength="4" placeholder="0000"
+                                            oninput="autoTab(this, 'e-p3', 4)" autocomplete="off">
+                                        <span class="divider">-</span>
+                                        <input type="text" id="e-p3" maxlength="7" placeholder="0000000"
+                                            oninput="autoTab(this, 'e-p4', 7)" autocomplete="off" class="wide">
+                                        <span class="divider">-</span>
+                                        <input type="text" id="e-p4" maxlength="1" placeholder="0" autocomplete="off"
+                                            class="narrow">
+                                    </div>
+                                    <div class="smart-status" id="e-smart-status"><i class="ph ph-check-circle"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Razón Social -->
+                            <div class="input-group full-width">
+                                <label for="e-razon">Razón Social</label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-buildings"></i>
+                                    <input type="text" id="e-razon" placeholder="Nombre o razón social"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+
+                            <!-- RUC -->
+                            <div class="input-group">
+                                <label for="e-ruc">RUC <span class="validation-msg" id="e-ruc-hint"></span></label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-identification-card"></i>
+                                    <input type="text" id="e-ruc" placeholder="11 dígitos" maxlength="11" required
+                                        autocomplete="off" oninput="validateRUC(this)">
+                                </div>
+                            </div>
+
+                            <!-- Fecha -->
+                            <div class="input-group">
+                                <label for="e-fecha">
+                                    Fecha Extrema
+                                    <button type="button" class="btn-tool" onclick="fillToday('e-fecha')"
+                                        title="Usar fecha actual">
+                                        <i class="ph ph-calendar-plus"></i> Hoy
+                                    </button>
+                                </label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-calendar-blank"></i>
+                                    <input type="text" id="e-fecha" placeholder="DD/MM/AAAA" maxlength="10"
+                                        autocomplete="off" oninput="formatDateInput(this)">
+                                </div>
+                            </div>
+
+                            <!-- Observaciones -->
+                            <div class="input-group full-width">
+                                <label for="e-obs">Observaciones <span class="badge-optional">Opcional</span></label>
+                                <div class="input-wrapper">
+                                    <i class="ph ph-chat-text"></i>
+                                    <input type="text" id="e-obs" placeholder="Detalles adicionales..."
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" onclick="clearForm()">
+                                <i class="ph ph-arrow-counter-clockwise"></i> Limpiar
+                            </button>
+                            <button type="submit" class="btn-primary blue-accent" id="save-expediente">
+                                <i class="ph ph-floppy-disk"></i> Guardar Expediente
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="footer-note">
+                <i class="ph ph-info"></i> Todos los cambios se sincronizan en el archivo Excel local.
+            </div>
+        </main>
+    </div>
+
+    <!-- NOTIFICATION SYSTEM -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
