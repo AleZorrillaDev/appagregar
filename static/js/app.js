@@ -117,10 +117,52 @@ function validateRUC(input) {
         input.className = 'valid';
         hint.textContent = '✓ Válido';
         hint.className = 'validation-msg ok';
+        
+        // Auto-query RUC
+        const targetId = input.id.includes('f-') ? 'f-razon' : 'e-razon';
+        fetchRUC(val, targetId);
     } else {
         input.className = 'invalid';
         hint.textContent = `${val.length}/11`;
         hint.className = 'validation-msg err';
+    }
+}
+
+async function fetchRUC(ruc, targetId) {
+    console.log(`Buscando RUC: ${ruc} para el campo: ${targetId}`);
+    const targetInput = document.getElementById(targetId);
+    if (!targetInput) {
+        console.error("No se encontró el campo de destino:", targetId);
+        return;
+    }
+    
+    const originalPlaceholder = targetInput.placeholder;
+    targetInput.placeholder = "🔍 Buscando...";
+    targetInput.classList.add('loading-field');
+
+    try {
+        const res = await fetch(`/api/ruc/${ruc}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        console.log("Datos recibidos de API:", data);
+        
+        if (data && data.razon_social) {
+            const nombre = data.razon_social.toUpperCase();
+            targetInput.value = nombre;
+            targetInput.classList.add('valid');
+            showToast('✓ ' + nombre, 'success');
+            console.log("Razón Social autocompletada.");
+        } else {
+            console.warn("La API no devolvió razon_social:", data);
+            showToast('RUC no encontrado', 'error');
+        }
+    } catch (err) {
+        console.error("Error al consultar RUC:", err);
+        showToast('Error de conexión con la API', 'error');
+    } finally {
+        targetInput.placeholder = originalPlaceholder;
+        targetInput.classList.remove('loading-field');
     }
 }
 

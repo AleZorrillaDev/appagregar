@@ -12,6 +12,7 @@ import openpyxl
 import os
 import webbrowser
 import threading
+import httpx
 
 # xlwings opcional
 try:
@@ -171,6 +172,19 @@ async def api_status():
         "formulario_count": count_records("FORMULARIO 194"),
         "expediente_count": count_records("EXPEDIENTES"),
     }
+
+
+@app.get("/api/ruc/{ruc}")
+async def get_ruc_info(ruc: str):
+    url = f"https://app1.dirislimacentro.gob.pe/std/mod_ext/api_sunat.php?action=qry_sunat_ruc&ruc={ruc}"
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            response = await client.get(url)
+            if response.status_code == 200:
+                return response.json()
+            return JSONResponse(status_code=response.status_code, content={"error": "API error"})
+        except Exception as e:
+            return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 @app.post("/api/formulario")
